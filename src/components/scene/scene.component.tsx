@@ -1,5 +1,6 @@
 import {CameraControls} from '@react-three/drei';
 import {Canvas} from '@react-three/fiber';
+import {Perf} from 'r3f-perf';
 
 import {LightsComponent} from './components/lights/lights.component.tsx';
 import {
@@ -20,6 +21,7 @@ export function SceneComponent() {
       }}
       gl={{antialias: false}}
     >
+      <Perf position={'top-left'} />
       <color attach={'background'} args={['#050505']} />
       <LightsComponent />
       <ParticlesComponent />
