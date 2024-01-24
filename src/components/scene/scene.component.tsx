@@ -15,7 +15,7 @@ export function SceneComponent() {
         fov: 27,
         aspect: 2,
         near: 5,
-        far: 35000,
+        far: 5000,
       }}
       gl={{antialias: false}}
     >
