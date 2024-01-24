@@ -17,6 +17,7 @@ export function SceneComponent() {
         near: 5,
         far: 35000,
       }}
+      gl={{antialias: false}}
     >
       <color attach={'background'} args={['#050505']} />
       <ParticlesComponent />
