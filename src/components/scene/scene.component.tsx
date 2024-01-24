@@ -1,4 +1,4 @@
-import {CameraControls} from '@react-three/drei';
+import {Bvh, CameraControls} from '@react-three/drei';
 import {Canvas} from '@react-three/fiber';
 import {Perf} from 'r3f-perf';
 
@@ -22,10 +22,14 @@ export function SceneComponent() {
       gl={{antialias: false}}
     >
       <Perf position={'top-left'} />
-      <color attach={'background'} args={['#050505']} />
-      <LightsComponent />
-      <ParticlesComponent />
       <CameraControls />
+
+      <LightsComponent />
+
+      <color attach={'background'} args={['#050505']} />
+      <Bvh firstHitOnly>
+        <ParticlesComponent />
+      </Bvh>
     </Canvas>
   </div>;
 }
