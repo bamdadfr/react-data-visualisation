@@ -1,6 +1,7 @@
 import {CameraControls} from '@react-three/drei';
 import {Canvas} from '@react-three/fiber';
 
+import {LightsComponent} from './components/lights/lights.component.tsx';
 import {
   ParticlesComponent,
 } from './components/particles/particles.component.tsx';
@@ -20,6 +21,7 @@ export function SceneComponent() {
       gl={{antialias: false}}
     >
       <color attach={'background'} args={['#050505']} />
+      <LightsComponent />
       <ParticlesComponent />
       <CameraControls />
     </Canvas>

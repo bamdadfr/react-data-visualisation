@@ -40,7 +40,14 @@ export function ParticlesComponent() {
     size: {value: 1, min: 1, max: 10, step: 1},
     is2d: false,
     rotate: false,
-    customShader: false,
+    opacity: {value: 1, min: 0, max: 1, step: 0.1},
+    shader: {
+      options: {
+        default: 'default',
+        custom: 'custom',
+        toon: 'toon',
+      },
+    },
   });
 
   useEffect(() => {
@@ -101,18 +108,26 @@ export function ParticlesComponent() {
         />
       </bufferGeometry>
 
-      {config.customShader ? (
+      {config.shader === 'default' &&
+        <pointsMaterial
+          size={config.size}
+          vertexColors
+          transparent
+          opacity={config.opacity}
+        />
+      }
+
+      {config.shader === 'custom' &&
         <shaderMaterial
           vertexColors
           vertexShader={vertexShader(config.size)}
           fragmentShader={fragmentShader}
         />
-      ) : (
-        <pointsMaterial
-          size={config.size}
-          vertexColors
-        />
-      )}
+      }
+
+      {config.shader === 'toon' &&
+        <meshToonMaterial transparent opacity={config.opacity} vertexColors />
+      }
     </points>
   );
 }
