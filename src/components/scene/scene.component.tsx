@@ -6,18 +6,14 @@ import {
 } from './components/particles/particles.component.tsx';
 import styles from './scene.module.scss';
 
-const width = 1000;
-const height = 500;
-const position = 2750;
-
 export function SceneComponent() {
   return <div className={styles.container}>
     <Canvas
       camera={{
-        position: [0, 0, position],
+        position: [0, 0, -2750],
         isPerspectiveCamera: true,
         fov: 27,
-        aspect: width / height,
+        aspect: 2,
         near: 5,
         far: 35000,
       }}

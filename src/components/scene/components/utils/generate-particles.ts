@@ -5,7 +5,7 @@ export interface Particles {
   colors: number[];
 }
 
-export function generateParticles(particles: number): Particles {
+export function generateParticles(millions: number, is2d: boolean = false): Particles {
   const n = 1000;
   const n2 = n / 2;
   const color = new Color();
@@ -13,10 +13,16 @@ export function generateParticles(particles: number): Particles {
   const positions = [];
   const colors = [];
 
-  for (let i = 0; i < particles; i += 1) {
+  for (let i = 0; i < millions * 1000000; i += 1) {
     const x = Math.random() * n - n2;
     const y = Math.random() * n - n2;
-    const z = Math.random() * n - n2;
+
+    let z: number;
+    if (is2d) {
+      z = 0;
+    } else {
+      z = Math.random() * n - n2;
+    }
 
     positions.push(x, y, z);
 

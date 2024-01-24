@@ -3,12 +3,32 @@ import {useControls} from 'leva';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Points} from 'three';
 
-import {generateParticles} from '../../../../utils/generate-particles.ts';
+import {generateParticles} from '../utils/generate-particles.ts';
+
+const defaultMillion = 1;
 
 const {
   positions: initPositions,
   colors: initColors,
-} = generateParticles(1000000);
+} = generateParticles(defaultMillion);
+
+const vertexShader = (size: number) => `
+  varying vec3 vColor;
+  
+  void main() {
+    vColor = color;
+    gl_PointSize = ${size.toFixed(1)};
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const fragmentShader = `
+  varying vec3 vColor;
+  
+  void main() {
+     gl_FragColor = vec4(vColor, 1.0);
+  }
+`;
 
 export function ParticlesComponent() {
   const pointsRef = useRef<Points | null>(null);
@@ -16,28 +36,27 @@ export function ParticlesComponent() {
   const [colors, setColors] = useState<number[]>(initColors);
 
   const config = useControls({
-    millions: {value: 1, min: 0.1, max: 3, step: 0.1},
+    millions: {value: defaultMillion, min: 0, max: 3, step: 0.25},
+    size: {value: 1, min: 1, max: 10, step: 1},
+    is2d: false,
     rotate: false,
+    customShader: false,
   });
 
   useEffect(() => {
-    const particles = config.millions * 1000000;
-
     const {
       positions: newPositions,
       colors: newColors,
-    } = generateParticles(
-      particles,
-    );
+    } = generateParticles(config.millions, config.is2d);
 
     setPositions(newPositions);
     setColors(newColors);
-  }, [config.millions]);
+  }, [config.millions, config.is2d]);
 
   const {raycaster} = useThree();
 
   useEffect(() => {
-    raycaster.params.Points.threshold = 0.5;
+    raycaster.params.Points.threshold = 0.4;
   }, [raycaster]);
 
   useFrame(() => {
@@ -64,7 +83,7 @@ export function ParticlesComponent() {
     });
   }, []);
 
-  console.log('render', colors.length);
+  console.log('ParticlesComponent render');
 
   return (
     <points
@@ -81,7 +100,19 @@ export function ParticlesComponent() {
           args={[colors, 3]}
         />
       </bufferGeometry>
-      <pointsMaterial size={3} vertexColors />
+
+      {config.customShader ? (
+        <shaderMaterial
+          vertexColors
+          vertexShader={vertexShader(config.size)}
+          fragmentShader={fragmentShader}
+        />
+      ) : (
+        <pointsMaterial
+          size={config.size}
+          vertexColors
+        />
+      )}
     </points>
   );
 }
