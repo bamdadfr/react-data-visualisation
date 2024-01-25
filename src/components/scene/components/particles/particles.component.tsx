@@ -30,8 +30,8 @@ const fragmentShader = `
 
 export function ParticlesComponent() {
   const pointsRef = useRef<Points | null>(null);
-  const [positions, setPositions] = useState<number[]>(initPositions);
-  const [colors, setColors] = useState<number[]>(initColors);
+  const [positions, setPositions] = useState<Float32Array>(initPositions);
+  const [colors, setColors] = useState<Float32Array>(initColors);
 
   const config = useControls({
     millions: {value: defaultMillion, min: 0, max: 3, step: 0.25},
@@ -80,8 +80,8 @@ export function ParticlesComponent() {
 
     const i = e.index! * 3;
 
-    setColors((s) => {
-      const copy = [...s];
+    setColors((c) => {
+      const copy = Float32Array.from(c);
       copy[i] = 1;
       copy[i + 1] = 0;
       copy[i + 2] = 0;
