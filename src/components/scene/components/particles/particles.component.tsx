@@ -7,10 +7,8 @@ import {generateParticles} from '../utils/generate-particles.ts';
 
 const defaultMillion = 1;
 
-const {
-  positions: initPositions,
-  colors: initColors,
-} = generateParticles(defaultMillion);
+const {positions: initPositions, colors: initColors} =
+  generateParticles(defaultMillion);
 
 const vertexShader = (size: number) => `
   varying vec3 vColor;
@@ -51,10 +49,10 @@ export function ParticlesComponent() {
   });
 
   useEffect(() => {
-    const {
-      positions: newPositions,
-      colors: newColors,
-    } = generateParticles(config.millions, config.is2d);
+    const {positions: newPositions, colors: newColors} = generateParticles(
+      config.millions,
+      config.is2d,
+    );
 
     setPositions(newPositions);
     setColors(newColors);
@@ -82,7 +80,7 @@ export function ParticlesComponent() {
 
     const i = e.index! * 3;
 
-    setColors(s => {
+    setColors((s) => {
       const copy = [...s];
       copy[i] = 1;
       copy[i + 1] = 0;
@@ -109,26 +107,30 @@ export function ParticlesComponent() {
         />
       </bufferGeometry>
 
-      {config.shader === 'default' &&
+      {config.shader === 'default' && (
         <pointsMaterial
           size={config.size}
           vertexColors
           transparent
           opacity={config.opacity}
         />
-      }
+      )}
 
-      {config.shader === 'custom' &&
+      {config.shader === 'custom' && (
         <shaderMaterial
           vertexColors
           vertexShader={vertexShader(config.size)}
           fragmentShader={fragmentShader}
         />
-      }
+      )}
 
-      {config.shader === 'toon' &&
-        <meshToonMaterial transparent opacity={config.opacity} vertexColors />
-      }
+      {config.shader === 'toon' && (
+        <meshToonMaterial
+          transparent
+          opacity={config.opacity}
+          vertexColors
+        />
+      )}
     </points>
   );
 }

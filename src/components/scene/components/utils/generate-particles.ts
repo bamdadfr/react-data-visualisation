@@ -5,7 +5,10 @@ export interface Particles {
   colors: number[];
 }
 
-export function generateParticles(millions: number, is2d: boolean = false): Particles {
+export function generateParticles(
+  millions: number,
+  is2d: boolean = false,
+): Particles {
   const n = 1000;
   const n2 = n / 2;
   const color = new Color();

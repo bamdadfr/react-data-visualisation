@@ -9,8 +9,12 @@ export function LightsComponent() {
 
   return (
     <React.Fragment>
-      {config.lightOn &&
-        <ambientLight color={'#404040'} intensity={config.lightIntensity} />}
+      {config.lightOn && (
+        <ambientLight
+          color={'#404040'}
+          intensity={config.lightIntensity}
+        />
+      )}
     </React.Fragment>
   );
 }
