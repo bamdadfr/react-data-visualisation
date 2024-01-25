@@ -89,8 +89,6 @@ export function ParticlesComponent() {
     });
   }, []);
 
-  console.log('ParticlesComponent render');
-
   return (
     <points
       ref={pointsRef}
