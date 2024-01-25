@@ -62,7 +62,7 @@ export function ParticlesComponent() {
 
   // https://threejs.org/examples/#webgl_interactive_raycasting_points
   useEffect(() => {
-    raycaster.params.Points.threshold = 0.4;
+    raycaster.params.Points.threshold = 0.2;
   }, [raycaster]);
 
   useFrame(() => {
