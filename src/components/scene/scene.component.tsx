@@ -1,8 +1,7 @@
-import {Bvh, CameraControls} from '@react-three/drei';
+import {CameraControls} from '@react-three/drei';
 import {Canvas} from '@react-three/fiber';
 import {Perf} from 'r3f-perf';
 
-import {LightsComponent} from './components/lights/lights.component.tsx';
 import {ParticlesComponent} from './components/particles/particles.component.tsx';
 import styles from './scene.module.scss';
 
@@ -15,7 +14,7 @@ export function SceneComponent() {
           isPerspectiveCamera: true,
           fov: 27,
           aspect: 2,
-          near: 5,
+          near: 1,
           far: 8000,
         }}
         gl={{antialias: false}}
@@ -23,15 +22,13 @@ export function SceneComponent() {
         <Perf position={'top-left'} />
         <CameraControls />
 
-        <LightsComponent />
-
         <color
           attach={'background'}
           args={['#050505']}
         />
-        <Bvh firstHitOnly>
+        <boxHelper>
           <ParticlesComponent />
-        </Bvh>
+        </boxHelper>
       </Canvas>
     </div>
   );

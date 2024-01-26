@@ -32,6 +32,7 @@
     "sass": "^1.70.0",
     "sass-reset": "^1.0.4",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vite-plugin-glsl": "^1.2.1"
   }
 }

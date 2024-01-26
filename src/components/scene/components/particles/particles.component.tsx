@@ -1,32 +1,24 @@
 import {ThreeEvent, useFrame, useThree} from '@react-three/fiber';
 import {useControls} from 'leva';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Points} from 'three';
 
+import {
+  DEFAULT_MILLIONS,
+  DEFAULT_OPACITY,
+  DEFAULT_SIZE,
+} from '../../../../constants.ts';
 import {generateParticles} from '../utils/generate-particles.ts';
-
-const defaultMillion = 1;
+import fragmentShader from './fragment.shader.glsl';
+import vertexShader from './vertex.shader.glsl';
 
 const {positions: initPositions, colors: initColors} =
-  generateParticles(defaultMillion);
+  generateParticles(DEFAULT_MILLIONS);
 
-const vertexShader = (size: number) => `
-  varying vec3 vColor;
-  
-  void main() {
-    vColor = color;
-    gl_PointSize = ${size.toFixed(1)};
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const fragmentShader = `
-  varying vec3 vColor;
-  
-  void main() {
-     gl_FragColor = vec4(vColor, 1.0);
-  }
-`;
+const materialOptions = {
+  default: 'default',
+  customShader: 'custom shader',
+};
 
 export function ParticlesComponent() {
   const pointsRef = useRef<Points | null>(null);
@@ -34,17 +26,13 @@ export function ParticlesComponent() {
   const [colors, setColors] = useState<Float32Array>(initColors);
 
   const config = useControls({
-    millions: {value: defaultMillion, min: 0, max: 3, step: 0.25},
-    size: {value: 1, min: 1, max: 10, step: 1},
+    millions: {value: DEFAULT_MILLIONS, min: 0, max: 3, step: 0.25},
+    size: {value: DEFAULT_SIZE, min: 1, max: 10, step: 1},
     is2d: false,
     rotate: false,
-    opacity: {value: 1, min: 0, max: 1, step: 0.1},
-    shader: {
-      options: {
-        default: 'default',
-        custom: 'custom',
-        toon: 'toon',
-      },
+    opacity: {value: DEFAULT_OPACITY, min: 0, max: 1, step: 0.05},
+    material: {
+      options: materialOptions,
     },
   });
 
@@ -62,8 +50,8 @@ export function ParticlesComponent() {
 
   // https://threejs.org/examples/#webgl_interactive_raycasting_points
   useEffect(() => {
-    raycaster.params.Points.threshold = 0.2;
-  }, [raycaster]);
+    raycaster.params.Points.threshold = 0.15 * config.size;
+  }, [raycaster, config.size, config.material]);
 
   useFrame(() => {
     if (!config.rotate) {
@@ -89,6 +77,23 @@ export function ParticlesComponent() {
     });
   }, []);
 
+  const uniforms = useMemo(() => {
+    return {
+      uSize: {
+        value: config.size,
+      },
+      uOpacity: {
+        value: config.opacity,
+      },
+      uScale: {
+        value: window.innerHeight / 2,
+      },
+    };
+  }, [config.size, config.opacity]);
+
+  // to trigger re-render on uniforms update
+  const materialKey = JSON.stringify(uniforms);
+
   return (
     <points
       ref={pointsRef}
@@ -105,7 +110,7 @@ export function ParticlesComponent() {
         />
       </bufferGeometry>
 
-      {config.shader === 'default' && (
+      {config.material === materialOptions.default && (
         <pointsMaterial
           size={config.size}
           vertexColors
@@ -114,19 +119,14 @@ export function ParticlesComponent() {
         />
       )}
 
-      {config.shader === 'custom' && (
+      {config.material === materialOptions.customShader && (
         <shaderMaterial
+          key={materialKey}
           vertexColors
-          vertexShader={vertexShader(config.size)}
+          vertexShader={vertexShader}
           fragmentShader={fragmentShader}
-        />
-      )}
-
-      {config.shader === 'toon' && (
-        <meshToonMaterial
+          uniforms={uniforms}
           transparent
-          opacity={config.opacity}
-          vertexColors
         />
       )}
     </points>
