@@ -1,0 +1,51 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@master
+
+      - name: install node
+        uses: actions/setup-node@master
+        with:
+          node-version: "20"
+
+      - name: install pnpm
+        run: npm install -g pnpm
+
+      - name: install dependencies
+        run: pnpm i
+
+      - name: build
+        run: pnpm build
+
+      - name: archive
+        run: cd dist && tar cvf ../github-pages.tar ./*
+
+      - name: upload
+        uses: actions/upload-artifact@main
+        with:
+          name: github-pages
+          path: ./github-pages.tar
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@main
+        with:
+          token: ${{ secrets.PAT }}
