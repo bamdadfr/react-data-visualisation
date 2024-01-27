@@ -26,9 +26,7 @@ export function SceneComponent() {
           attach={'background'}
           args={['#050505']}
         />
-        <boxHelper>
-          <ParticlesComponent />
-        </boxHelper>
+        <ParticlesComponent />
       </Canvas>
     </div>
   );
