@@ -31,6 +31,7 @@ export function ParticlesComponent() {
     size: {value: DEFAULT_SIZE, min: 1, max: 10, step: 1},
     is2d: false,
     rotate: false,
+    hover: false,
     opacity: {value: DEFAULT_OPACITY, min: 0, max: 1, step: 0.05},
     material: {
       options: materialOptions,
@@ -47,7 +48,7 @@ export function ParticlesComponent() {
     setColors(newColors);
   }, [config.millions, config.is2d]);
 
-  const {raycaster, camera, size} = useThree();
+  const {raycaster, camera, size, scene} = useThree();
 
   // https://threejs.org/examples/#webgl_interactive_raycasting_points
   useEffect(() => {
@@ -62,6 +63,30 @@ export function ParticlesComponent() {
     const points = pointsRef.current!;
     points.rotation.x += 0.001;
     points.rotation.y += 0.002;
+  });
+
+  useFrame(() => {
+    if (!config.hover) {
+      return;
+    }
+
+    const intersects = raycaster.intersectObjects(scene.children);
+
+    if (intersects.length === 0) {
+      return;
+    }
+
+    for (const {index} of intersects) {
+      const i = index! * 3;
+
+      setColors((oldColors) => {
+        const newColors = Float32Array.from(oldColors);
+        newColors[i] = 1;
+        newColors[i + 1] = 0;
+        newColors[i + 2] = 0;
+        return newColors;
+      });
+    }
   });
 
   const projectToScreen = useCallback(
