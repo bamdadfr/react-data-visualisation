@@ -1,6 +1,7 @@
 import {ThreeEvent, useFrame, useThree} from '@react-three/fiber';
 import {useControls} from 'leva';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import * as THREE from 'three';
 import {Points} from 'three';
 
 import {
@@ -46,7 +47,7 @@ export function ParticlesComponent() {
     setColors(newColors);
   }, [config.millions, config.is2d]);
 
-  const {raycaster} = useThree();
+  const {raycaster, camera, size} = useThree();
 
   // https://threejs.org/examples/#webgl_interactive_raycasting_points
   useEffect(() => {
@@ -63,19 +64,40 @@ export function ParticlesComponent() {
     points.rotation.y += 0.002;
   });
 
-  const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation();
+  const projectToScreen = useCallback(
+    (i: number) => {
+      const vector = new THREE.Vector3(
+        positions[i],
+        positions[i + 1],
+        positions[i + 2],
+      );
+      vector.project(camera);
+      vector.x = Math.round(((vector.x + 1) * size.width) / 2);
+      vector.y = Math.round(((-vector.y + 1) * size.height) / 2);
+      vector.z = 0;
 
-    const i = e.index! * 3;
+      console.log('Projected screen coordinates', vector.x, vector.y);
+    },
+    [positions, camera, size],
+  );
 
-    setColors((c) => {
-      const copy = Float32Array.from(c);
-      copy[i] = 1;
-      copy[i + 1] = 0;
-      copy[i + 2] = 0;
-      return copy;
-    });
-  }, []);
+  const handleClick = useCallback(
+    (e: ThreeEvent<MouseEvent>) => {
+      e.stopPropagation();
+
+      const i = e.index! * 3;
+      projectToScreen(i);
+
+      setColors((oldColors) => {
+        const newColors = Float32Array.from(oldColors);
+        newColors[i] = 1;
+        newColors[i + 1] = 0;
+        newColors[i + 2] = 0;
+        return newColors;
+      });
+    },
+    [projectToScreen],
+  );
 
   const uniforms = useMemo(() => {
     return {
